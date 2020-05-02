@@ -11,12 +11,15 @@ const grpc = require("grpc")
 const test = require("../proto_out/gRPC/proto/test_pb")
 const service = require("../proto_out/gRPC/proto/test_grpc_pb")
 
+// Constaints
+const SCRIPT_START_TIME = process.hrtime()
+const NUMBER_OF_REQUESTS = 100
+
 // Timing Capture variables.
 const emptyTimings = []
 const singleTimings = []
 const multiTimings = []
 
-const START_TIME = process.hrtime()
 
 // Helper method for getting a client connection for the server.
 const getClientConnection = () => {
@@ -27,12 +30,14 @@ const getClientConnection = () => {
 };
 
 
+// Helper method to create a new request to send to the server.
 const getRequest = () => {
     let request = new test.EmptyRequest();
     request.setTimestamp(Number(process.hrtime.bigint()))
 
     return request
 }
+
 
 // Empty request
 const getEmpty = () => {
@@ -49,6 +54,7 @@ const getEmpty = () => {
     });
 };
 
+
 // Single Film Request
 const getSingle = async () => {
 
@@ -64,7 +70,8 @@ const getSingle = async () => {
     });
 };
 
-// Single Film Request
+
+// Multiple Film Request
 const getMultiple = async () => {
 
     const client = getClientConnection();
@@ -79,12 +86,13 @@ const getMultiple = async () => {
     });
 };
 
-const NUMBER_OF_REQUESTS = 100
+
 const timeIt = async (func) => {
     for (let i = 0; i < NUMBER_OF_REQUESTS; i++) {
         await func();
     }
 }
+
 
 // Client entry point.
 (async () => {
@@ -93,18 +101,22 @@ const timeIt = async (func) => {
     await timeIt(getMultiple)
 })()
 
+
+// Exit Hook, Save findings to CSV
 process.on("exit", () => {
     console.log(emptyTimings.length)
     console.log(singleTimings.length)
     console.log(multiTimings.length)
-    const END_TIME = process.hrtime(START_TIME)[1]
-    console.log(END_TIME)
     write_out_results()
 })
 
+
+// Create a CSV stringifier
 const createObjectCsvStringifier = require('csv-writer').createObjectCsvStringifier;
 
-const getCsvWriter = () => {
+
+// Creates a CSV Stringifier for saving the connection findings.
+const getCsvStringifier = () => {
     return createObjectCsvStringifier({
         header: [
             {id: 'empty_timing', title: 'ET'},
@@ -114,14 +126,19 @@ const getCsvWriter = () => {
     });
 }
 
-const write_out_results = () => {
 
+// Utility function to write out the findings to a CSV file.
+const write_out_results = () => {
     const data = []
+
+    // Add headers
     data.push({
         "empty_timing": "ET",
         "single_item_timing": "SIT",
         "ten_item_timing": "MIT"
     })
+
+    // Add Data
     for (let i = 0; i < NUMBER_OF_REQUESTS; i++) {
         data.push({
             "empty_timing": emptyTimings[i]/1_000_000,
@@ -130,6 +147,8 @@ const write_out_results = () => {
         })
     }
 
-    const csvWriter = getCsvWriter()
-    fs.writeFileSync("out.csv", csvWriter.stringifyRecords(data), )
+    // Save data to file synchronously, async write wont work due to
+    // running this code from exit hook.
+    const csvStringifier = getCsvStringifier()
+    fs.writeFileSync("out.csv", csvStringifier.stringifyRecords(data), )
 }

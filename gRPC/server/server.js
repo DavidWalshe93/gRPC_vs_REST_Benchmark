@@ -2,27 +2,20 @@
 // 02/05/2020
 
 // NPM Modules
-const grpc = require("grpc")
+const grpc = require("grpc");
 
 // Proto imports
 const test = require("../proto_out/gRPC/proto/test_pb");
 const service = require("../proto_out/gRPC/proto/test_grpc_pb");
 
-const db = require("../../films.json")
+// Data to send in Responses
+const db = require("../../films.json");
+const NUMBER_OF_FILMS = 100;
 
-const getEmpty = (call, cb) => {
-    const timestamp = call.request.getTimestamp();
 
-    // Create a protobuf response object.
-    let emptyResponse = new test.EmptyResponse();
-    emptyResponse.setTimestamp(timestamp)
-
-    // Send response to client
-    cb(null, emptyResponse)
-};
-
+// Helper method to load data into Film protobuf.
 const loadFilm = () => {
-    const film_json = db[0]
+    const film_json = db[0];
     let film = new test.Film();
 
     film.setId(film_json.id);
@@ -32,44 +25,68 @@ const loadFilm = () => {
     film.setDescription(film_json.description);
     film.setPrice(film_json.price);
 
-    return film
+    return film;
 }
 
+
+// Helper method to load data into Films protobuf.
 const loadFilms = () => {
     let films = new test.Films();
 
-    for (let i = 0; i < 100; i++) {
-        films.addFilms(loadFilm())
+    for (let i = 0; i < NUMBER_OF_FILMS; i++) {
+        films.addFilms(loadFilm());
     }
 
     return films;
 }
 
 
+// Static Response Data
+const FILM = loadFilm();
+const FILMS = loadFilms();
+
+
+// Empty Request Handler
+const getEmpty = (call, cb) => {
+    const timestamp = call.request.getTimestamp();
+
+    // Create a protobuf response object.
+    let emptyResponse = new test.EmptyResponse();
+    emptyResponse.setTimestamp(timestamp);
+
+    // Send response to client
+    cb(null, emptyResponse);
+};
+
+
+// Empty Request Handler
 const getSingle = (call, cb) => {
     const timestamp = call.request.getTimestamp();
 
     // Create a protobuf response object.
     let singleFilmResponse = new test.SingleFilmResponse();
-    singleFilmResponse.setTimestamp(timestamp)
-    singleFilmResponse.setFilm(loadFilm())
+    singleFilmResponse.setTimestamp(timestamp);
+    singleFilmResponse.setFilm(FILM);
 
     // Send response to client
-    cb(null, singleFilmResponse)
+    cb(null, singleFilmResponse);
 };
 
+
+// Multiple Request Handler
 const getMultiple = (call, cb) => {
     const timestamp = call.request.getTimestamp();
 
     // Create a protobuf response object.
     let multipleFilmResponse = new test.MultiFilmResponse();
-    multipleFilmResponse.setTimestamp(timestamp)
-    multipleFilmResponse.setFilms(loadFilms())
+    multipleFilmResponse.setTimestamp(timestamp);
+    multipleFilmResponse.setFilms(FILMS);
 
     // Send response to client
-    cb(null, multipleFilmResponse)
+    cb(null, multipleFilmResponse);
 };
 
+// Run server.
 const main = () => {
     const server = new grpc.Server();
 
@@ -79,11 +96,11 @@ const main = () => {
         getSingle: getSingle,
         getMultiple: getMultiple,
     });
-
-    server.bind("127.0.0.1:50051", grpc.ServerCredentials.createInsecure());
+    const PORT = "0.0.0.0:50051"
+    server.bind(`${PORT}`, grpc.ServerCredentials.createInsecure());
     server.start();
 
-    console.log("Server running on 127.0.0.1:50051")
+    console.log(`Server running on ${PORT}`);
 };
 
 main();
