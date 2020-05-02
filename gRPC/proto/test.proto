@@ -1,0 +1,60 @@
+// Author: David Walshe
+// Date:   19/04/2020
+
+syntax = "proto3";
+
+package test;
+
+// =====================================================================================================================
+// Data Messages
+// =====================================================================================================================
+
+message Film {
+    string id = 1;
+    string title = 2;
+    string length = 3;
+    string rating = 4;
+    string description = 5;
+    string price = 6;
+}
+
+message Films {
+    repeated Film films = 1;
+}
+
+// =====================================================================================================================
+// Service Messages
+// =====================================================================================================================
+
+// Empty
+// ---------------------------------------------------------------------------------------------------------------------
+message EmptyRequest {
+    uint64 timestamp = 1;
+}
+
+message EmptyResponse {
+    uint64 timestamp = 1;
+}
+
+message SingleFilmResponse {
+    uint64 timestamp = 1;
+    Film film = 2;
+}
+
+message MultiFilmResponse {
+    uint64 timestamp = 1;
+    Films films = 2;
+}
+
+
+// =====================================================================================================================
+// Services
+// =====================================================================================================================
+service TestService {
+    // Service for Empty Message Testing
+    rpc GetEmpty (EmptyRequest) returns (EmptyResponse) {};
+    // Service for Single Text Testing
+    rpc GetSingle (EmptyRequest) returns (SingleFilmResponse) {};
+    // Service for Multi Text Testing
+    rpc GetMultiple (EmptyRequest) returns (MultiFilmResponse) {};
+}
