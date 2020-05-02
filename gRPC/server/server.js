@@ -96,8 +96,8 @@ const main = () => {
         getSingle: getSingle,
         getMultiple: getMultiple,
     });
-    const PORT = "0.0.0.0:50051"
-    server.bind(`${PORT}`, grpc.ServerCredentials.createInsecure());
+    const PORT = process.env.gRPC_PORT || "50051"
+    server.bind(`0.0.0.0:${PORT}`, grpc.ServerCredentials.createInsecure());
     server.start();
 
     console.log(`Server running on ${PORT}`);

@@ -26,22 +26,40 @@ const app = express();
 app.use(express.json());
 
 
-const PORT = 3001;
-
 app.get("/empty", async (req, res) => {
-    res.end();
+    try {
+        res.send(req.query);
+    } catch (e) {
+        console.log(e)
+        res.status(400).send()
+    }
 })
 
 
 app.get("/film", async (req, res) => {
-    res.send(film);
+    try {
+        res.send({
+            ...film,
+            ...req.query
+        });
+    } catch (e) {
+        console.log(e)
+        res.status(400).send()
+    }
 })
 
 
 app.get("/films", async (req, res) => {
-    res.send(films);
+    try {
+        res.send({
+            ...films,
+            ...req.query
+        });
+    } catch (e) {
+        console.log(e)
+        res.status(400).send()
+    }
 })
-
 
 
 module.exports = app;

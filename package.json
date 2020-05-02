@@ -1,10 +1,33 @@
 {
-  "name": "benchmark_http_gRPC",
+  "name": "benchmark_http_grpc",
   "version": "1.0.0",
   "dependencies": {
     "csv-writer": "^1.6.0",
     "express": "^4.17.1",
     "google-protobuf": "^3.11.4",
-    "grpc": "^1.24.2"
-  }
+    "grpc": "^1.24.2",
+    "request": "^2.88.2"
+  },
+  "description": "http Vs gRPC benchmarking",
+  "devDependencies": {
+    "env-cmd": "^10.1.0",
+    "nodemon": "^2.0.3"
+  },
+  "scripts": {
+    "grpc_server": "env-cmd -f config.env nodemon gRPC/server/server.js",
+    "grpc_client": "env-cmd -f config.env nodemon gRPC/client/client.js",
+    "rest_server": "env-cmd -f config.env nodemon REST/server/index.js",
+    "rest_client": "env-cmd -f config.env nodemon REST\\client\\client.js",
+    "rest_client_ka": "env-cmd -f config.env nodemon REST/client/client_ka.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DavidWalshe93/gRPC_vs_REST_Benchmark.git"
+  },
+  "author": "David Walshe",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DavidWalshe93/gRPC_vs_REST_Benchmark/issues"
+  },
+  "homepage": "https://github.com/DavidWalshe93/gRPC_vs_REST_Benchmark#readme"
 }

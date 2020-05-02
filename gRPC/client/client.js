@@ -7,6 +7,9 @@ const fs = require("fs")
 // NPM Modules
 const grpc = require("grpc")
 
+// Local Modules
+const csv_writer = require("../../utils/csv_writer")
+
 // Proto imports
 const test = require("../proto_out/gRPC/proto/test_pb")
 const service = require("../proto_out/gRPC/proto/test_grpc_pb")
@@ -23,8 +26,11 @@ const multiTimings = []
 
 // Helper method for getting a client connection for the server.
 const getClientConnection = () => {
+    const IP_ADDRESS = process.env.SERVER_IP || "localhost";
+    const PORT = process.env.gRPC_PORT || 50051;
+
     return new service.TestServiceClient(
-        "localhost:50051",
+        `${IP_ADDRESS}:${PORT}`,
         grpc.credentials.createInsecure()
     )
 };
@@ -99,7 +105,7 @@ const timeIt = async (func) => {
     await timeIt(getEmpty)
     await timeIt(getSingle)
     await timeIt(getMultiple)
-})()
+})();
 
 
 // Exit Hook, Save findings to CSV
@@ -107,48 +113,5 @@ process.on("exit", () => {
     console.log(emptyTimings.length)
     console.log(singleTimings.length)
     console.log(multiTimings.length)
-    write_out_results()
+    csv_writer.write_out_results("gRPC.csv", emptyTimings, singleTimings, multiTimings, NUMBER_OF_REQUESTS)
 })
-
-
-// Create a CSV stringifier
-const createObjectCsvStringifier = require('csv-writer').createObjectCsvStringifier;
-
-
-// Creates a CSV Stringifier for saving the connection findings.
-const getCsvStringifier = () => {
-    return createObjectCsvStringifier({
-        header: [
-            {id: 'empty_timing', title: 'ET'},
-            {id: 'single_item_timing', title: 'SIT'},
-            {id: 'ten_item_timing', title: 'MIT'}
-        ]
-    });
-}
-
-
-// Utility function to write out the findings to a CSV file.
-const write_out_results = () => {
-    const data = []
-
-    // Add headers
-    data.push({
-        "empty_timing": "ET",
-        "single_item_timing": "SIT",
-        "ten_item_timing": "MIT"
-    })
-
-    // Add Data
-    for (let i = 0; i < NUMBER_OF_REQUESTS; i++) {
-        data.push({
-            "empty_timing": emptyTimings[i]/1_000_000,
-            "single_item_timing": singleTimings[i]/1_000_000,
-            "ten_item_timing": multiTimings[i]/1_000_000
-        })
-    }
-
-    // Save data to file synchronously, async write wont work due to
-    // running this code from exit hook.
-    const csvStringifier = getCsvStringifier()
-    fs.writeFileSync("out.csv", csvStringifier.stringifyRecords(data), )
-}

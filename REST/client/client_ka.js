@@ -20,7 +20,7 @@ const singleTimings = []
 const multiTimings = []
 
 
-http.globalAgent.keepAlive = true;
+http.globalAgent.keepAlive = false;
 
 const SERVER_IP = process.env.SERVER_IP || "http://localhost";
 const PORT = process.env.PORT || "3001"
@@ -63,5 +63,5 @@ process.on("exit", () => {
     console.log(emptyTimings.length)
     console.log(singleTimings.length)
     console.log(multiTimings.length)
-    csv_writer.write_out_results("rest.csv", emptyTimings, singleTimings, multiTimings, NUMBER_OF_REQUESTS)
+    csv_writer.write_out_results("rest_ka.csv", emptyTimings, singleTimings, multiTimings, NUMBER_OF_REQUESTS)
 })

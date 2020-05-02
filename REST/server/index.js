@@ -5,7 +5,7 @@
 const app = require("./app")
 
 // Setup PORT
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.REST_PORT || 3001;
 
 // Start express server.
 app.listen(PORT, () => {
