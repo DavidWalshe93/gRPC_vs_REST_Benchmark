@@ -50,7 +50,8 @@ const write_out_results = (file_name, emptyTimings, singleItemTimings, multiItem
     // Save data to file synchronously, async write wont work due to
     // running this code from exit hook.
     const csvStringifier = getCsvStringifier()
-    fs.appendFileSync(path, csvStringifier.stringifyRecords(data), )
+    fs.appendFileSync(path, csvStringifier.stringifyRecords(data))
+    console.log(`Appended ${numberOfRequests} records to ${path}`)
 }
 
 

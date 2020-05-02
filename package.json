@@ -15,10 +15,10 @@
   },
   "scripts": {
     "grpc_server": "env-cmd -f config.env nodemon gRPC/server/server.js",
-    "grpc_client": "env-cmd -f config.env nodemon gRPC/client/client.js",
+    "grpc_client": "env-cmd -f config.env node gRPC/client/client.js",
     "rest_server": "env-cmd -f config.env nodemon REST/server/index.js",
-    "rest_client": "env-cmd -f config.env nodemon REST\\client\\client.js",
-    "rest_client_ka": "env-cmd -f config.env nodemon REST/client/client_ka.js"
+    "rest_client": "env-cmd -f config.env node REST/client/client.js 0",
+    "rest_client_ka": "env-cmd -f config.env node REST/client/client.js 1"
   },
   "repository": {
     "type": "git",

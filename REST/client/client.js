@@ -11,28 +11,35 @@ const request = require("request");
 const csv_writer = require("../../utils/csv_writer")
 
 // Constaints
-const SCRIPT_START_TIME = process.hrtime()
-const NUMBER_OF_REQUESTS = 1
+const NUMBER_OF_REQUESTS = 1;
 
 // Timing Capture variables.
-const emptyTimings = []
-const singleTimings = []
-const multiTimings = []
+const emptyTimings = [];
+const singleTimings = [];
+const multiTimings = [];
 
+let file_name = "";
+if (process.argv[2] === "1") {
+    http.globalAgent.keepAlive = true;
+    file_name = "rest_ka.csv";
+} else {
+    http.globalAgent.keepAlive = false;
+    file_name = "rest.csv";
+}
 
-http.globalAgent.keepAlive = true;
 
 const SERVER_IP = process.env.SERVER_IP || "http://localhost";
 const PORT = process.env.PORT || "3001"
 
 const SERVER_URL = `${SERVER_IP}:${PORT}`;
-console.log("SERVER_IP: ", SERVER_URL)
+console.log("SERVER URL: ", SERVER_URL)
 
 
 const sendRequest = async (endpoint, timing_list) => {
     const timestamp = Number(process.hrtime.bigint())
     const ENDPOINT = `${SERVER_URL}${endpoint}?timestamp=${timestamp}`;
-    request(`${SERVER_URL}${endpoint}?timestamp=${timestamp}`,(err, res) => {
+
+    request(ENDPOINT,(err, res) => {
         if (!err) {
             let timestamp = Number(JSON.parse(res.body).timestamp);
             const RTT = Number(process.hrtime.bigint()) - timestamp;
@@ -50,6 +57,7 @@ const timeIt = async (endpoint, timing_list) => {
     }
 }
 
+
 // Client entry point.
 (async () => {
     await timeIt("/empty", emptyTimings)
@@ -63,5 +71,5 @@ process.on("exit", () => {
     console.log(emptyTimings.length)
     console.log(singleTimings.length)
     console.log(multiTimings.length)
-    csv_writer.write_out_results("rest.csv", emptyTimings, singleTimings, multiTimings, NUMBER_OF_REQUESTS)
+    csv_writer.write_out_results(file_name, emptyTimings, singleTimings, multiTimings, NUMBER_OF_REQUESTS)
 })

@@ -18,6 +18,13 @@ const service = require("../proto_out/gRPC/proto/test_grpc_pb")
 const SCRIPT_START_TIME = process.hrtime()
 const NUMBER_OF_REQUESTS = 100
 
+const IP_ADDRESS = process.env.SERVER_IP || "localhost";
+const PORT = process.env.gRPC_PORT || 50051;
+
+const SERVER_URL = `${IP_ADDRESS}:${PORT}`
+console.log("SERVER URL: ", SERVER_URL)
+
+
 // Timing Capture variables.
 const emptyTimings = []
 const singleTimings = []
@@ -26,11 +33,10 @@ const multiTimings = []
 
 // Helper method for getting a client connection for the server.
 const getClientConnection = () => {
-    const IP_ADDRESS = process.env.SERVER_IP || "localhost";
-    const PORT = process.env.gRPC_PORT || 50051;
+
 
     return new service.TestServiceClient(
-        `${IP_ADDRESS}:${PORT}`,
+        SERVER_URL,
         grpc.credentials.createInsecure()
     )
 };
