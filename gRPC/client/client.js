@@ -64,6 +64,7 @@ const getEmpty = () => {
             console.log(error);
         }
     });
+    process.stdout.write(".");
 };
 
 
@@ -116,8 +117,5 @@ const timeIt = async (func) => {
 
 // Exit Hook, Save findings to CSV
 process.on("exit", () => {
-    console.log(emptyTimings.length)
-    console.log(singleTimings.length)
-    console.log(multiTimings.length)
     csv_writer.write_out_results("gRPC.csv", emptyTimings, singleTimings, multiTimings, NUMBER_OF_REQUESTS)
 })

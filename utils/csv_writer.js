@@ -25,7 +25,12 @@ const getCsvStringifier = () => {
 // Utility function to write out the findings to a CSV file.
 const write_out_results = (file_name, emptyTimings, singleItemTimings, multiItemTimings, numberOfRequests) => {
     const data = []
-    const path = `out\\${file_name}`
+    const path = `R:\\Data\\${file_name}`
+
+    console.log()
+    console.log("Empty Responses: ", emptyTimings.length)
+    console.log("Single Item Responses: ", singleItemTimings.length)
+    console.log("Multi Item Responses: ", multiItemTimings.length)
 
     // Add headers if the file does not previously exist
     fs.access(path, fs.constants.F_OK, (err) => {

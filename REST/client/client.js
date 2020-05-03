@@ -11,7 +11,7 @@ const request = require("request");
 const csv_writer = require("../../utils/csv_writer")
 
 // Constaints
-const NUMBER_OF_REQUESTS = 1;
+const NUMBER_OF_REQUESTS = process.env.NUMBER_OF_REQUESTS;
 
 // Timing Capture variables.
 const emptyTimings = [];
@@ -28,10 +28,10 @@ if (process.argv[2] === "1") {
 }
 
 
-const SERVER_IP = process.env.SERVER_IP || "http://localhost";
+const SERVER_IP = process.env.SERVER_IP || "localhost";
 const PORT = process.env.PORT || "3001"
 
-const SERVER_URL = `${SERVER_IP}:${PORT}`;
+const SERVER_URL = `http://${SERVER_IP}:${PORT}`;
 console.log("SERVER URL: ", SERVER_URL)
 
 
@@ -68,8 +68,5 @@ const timeIt = async (endpoint, timing_list) => {
 
 // Exit Hook, Save findings to CSV
 process.on("exit", () => {
-    console.log(emptyTimings.length)
-    console.log(singleTimings.length)
-    console.log(multiTimings.length)
     csv_writer.write_out_results(file_name, emptyTimings, singleTimings, multiTimings, NUMBER_OF_REQUESTS)
 })
