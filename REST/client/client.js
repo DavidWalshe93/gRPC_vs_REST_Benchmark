@@ -12,6 +12,9 @@ const csv_writer = require("../../utils/csv_writer")
 
 // Constants
 const NUMBER_OF_REQUESTS = process.env.NUMBER_OF_REQUESTS || 1;
+const PACKET_BURST_TIME = process.env.PACKET_BURST_TIME || 5000;
+const BURSTS = process.env.BURSTS || 10;
+const TOTAL_TIME = (PACKET_BURST_TIME * BURSTS) + (PACKET_BURST_TIME / 2)
 
 // Timing Capture variables.
 const emptyTimings = [];
@@ -57,13 +60,20 @@ const timeIt = async (endpoint, timing_list) => {
     }
 }
 
-
+let burst_count = 1
 // Client entry point.
-(async () => {
+const intervalId = setInterval(async () => {
     await timeIt("/empty", emptyTimings)
     await timeIt("/film", singleTimings)
     await timeIt("/films", multiTimings)
-})();
+    console.log("Burst: ", burst_count)
+    burst_count++;
+}, PACKET_BURST_TIME);
+
+setTimeout(() => {
+    console.log("Completed sending Packet Bursts")
+    clearInterval(intervalId)
+}, TOTAL_TIME);
 
 
 // Exit Hook, Save findings to CSV

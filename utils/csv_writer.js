@@ -43,8 +43,10 @@ const write_out_results = (file_name, emptyTimings, singleItemTimings, multiItem
         }
     });
 
+    let indexSize = Math.max(emptyTimings.length, singleItemTimings.length, multiItemTimings.length)
+
     // Add Data
-    for (let i = 0; i < numberOfRequests; i++) {
+    for (let i = 0; i < indexSize; i++) {
         data.push({
             "empty_timing": emptyTimings[i]/1_000_000,
             "single_item_timing": singleItemTimings[i]/1_000_000,

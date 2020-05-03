@@ -14,9 +14,11 @@ const csv_writer = require("../../utils/csv_writer")
 const test = require("../proto_out/gRPC/proto/test_pb")
 const service = require("../proto_out/gRPC/proto/test_grpc_pb")
 
-// Constaints
-const SCRIPT_START_TIME = process.hrtime()
+// Constants
 const NUMBER_OF_REQUESTS = process.env.NUMBER_OF_REQUESTS || 1;
+const PACKET_BURST_TIME = process.env.PACKET_BURST_TIME || 5000;
+const BURSTS = process.env.BURSTS || 10;
+const TOTAL_TIME = (PACKET_BURST_TIME * BURSTS) + (PACKET_BURST_TIME / 2)
 
 const IP_ADDRESS = process.env.SERVER_IP || "localhost";
 const PORT = process.env.gRPC_PORT || 50051;
@@ -41,6 +43,8 @@ const getClientConnection = () => {
     )
 };
 
+const client = getClientConnection();
+
 
 // Helper method to create a new request to send to the server.
 const getRequest = () => {
@@ -54,7 +58,7 @@ const getRequest = () => {
 // Empty request
 const getEmpty = () => {
 
-    const client = getClientConnection();
+    // const client = getClientConnection();
     // Call the server RPC "testEmpty".
     client.getEmpty(getRequest(), (error, response) => {
         if (!error) {
@@ -71,7 +75,7 @@ const getEmpty = () => {
 // Single Film Request
 const getSingle = async () => {
 
-    const client = getClientConnection();
+    // const client = getClientConnection();
     // Call the server RPC "testEmpty".
     client.getSingle(getRequest(), (error, response) => {
         if (!error) {
@@ -87,7 +91,7 @@ const getSingle = async () => {
 // Multiple Film Request
 const getMultiple = async () => {
 
-    const client = getClientConnection();
+    // const client = getClientConnection();
     // Call the server RPC "testEmpty".
     client.getMultiple(getRequest(), (error, response) => {
         if (!error) {
@@ -106,13 +110,27 @@ const timeIt = async (func) => {
     }
 }
 
-
+let burst_count = 1
 // Client entry point.
-(async () => {
+const intervalId = setInterval(async () => {
     await timeIt(getEmpty)
     await timeIt(getSingle)
     await timeIt(getMultiple)
-})();
+    console.log("Burst: ", burst_count)
+    burst_count++;
+}, PACKET_BURST_TIME);
+
+setTimeout(() => {
+    console.log("Completed sending Packet Bursts")
+    clearInterval(intervalId)
+}, TOTAL_TIME);
+
+// // Client entry point.
+// (async () => {
+//     await timeIt(getEmpty)
+//     await timeIt(getSingle)
+//     await timeIt(getMultiple)
+// })();
 
 
 // Exit Hook, Save findings to CSV
