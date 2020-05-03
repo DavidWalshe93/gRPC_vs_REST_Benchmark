@@ -56,6 +56,7 @@ const getEmpty = (call, cb) => {
 
     // Send response to client
     cb(null, emptyResponse);
+    process.stdout.write(".")
 };
 
 
@@ -70,6 +71,7 @@ const getSingle = (call, cb) => {
 
     // Send response to client
     cb(null, singleFilmResponse);
+    process.stdout.write(".")
 };
 
 
@@ -84,6 +86,7 @@ const getMultiple = (call, cb) => {
 
     // Send response to client
     cb(null, multipleFilmResponse);
+    process.stdout.write(".")
 };
 
 // Run server.

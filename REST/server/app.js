@@ -33,6 +33,7 @@ app.get("/empty", async (req, res) => {
         console.log(e)
         res.status(400).send()
     }
+    process.stdout.write(".")
 })
 
 
@@ -46,6 +47,7 @@ app.get("/film", async (req, res) => {
         console.log(e)
         res.status(400).send()
     }
+    process.stdout.write(".")
 })
 
 
@@ -59,6 +61,7 @@ app.get("/films", async (req, res) => {
         console.log(e)
         res.status(400).send()
     }
+    process.stdout.write(".")
 })
 
 
