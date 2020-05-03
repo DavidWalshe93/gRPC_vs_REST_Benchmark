@@ -16,7 +16,7 @@ const service = require("../proto_out/gRPC/proto/test_grpc_pb")
 
 // Constaints
 const SCRIPT_START_TIME = process.hrtime()
-const NUMBER_OF_REQUESTS = 100
+const NUMBER_OF_REQUESTS = process.env.NUMBER_OF_REQUESTS || 1;
 
 const IP_ADDRESS = process.env.SERVER_IP || "localhost";
 const PORT = process.env.gRPC_PORT || 50051;

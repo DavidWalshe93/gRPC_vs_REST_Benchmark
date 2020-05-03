@@ -10,7 +10,7 @@ const service = require("../proto_out/gRPC/proto/test_grpc_pb");
 
 // Data to send in Responses
 const db = require("../../films.json");
-const NUMBER_OF_FILMS = 100;
+const NUMBER_OF_FILMS = process.env.NUMBER_OF_ITEMS || 1;
 
 
 // Helper method to load data into Film protobuf.

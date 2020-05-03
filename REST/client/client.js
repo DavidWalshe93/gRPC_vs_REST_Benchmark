@@ -10,8 +10,8 @@ const request = require("request");
 // Local Modules
 const csv_writer = require("../../utils/csv_writer")
 
-// Constaints
-const NUMBER_OF_REQUESTS = process.env.NUMBER_OF_REQUESTS;
+// Constants
+const NUMBER_OF_REQUESTS = process.env.NUMBER_OF_REQUESTS || 1;
 
 // Timing Capture variables.
 const emptyTimings = [];

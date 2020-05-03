@@ -6,7 +6,7 @@ const express = require("express")
 
 // Load local Data
 const db = require("../../films.json")
-const NUMBER_OF_FILMS = 100;
+const NUMBER_OF_FILMS = process.env.NUMBER_OF_ITEMS || 100;
 
 const film = db[0]
 const films = () => {
