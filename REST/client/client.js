@@ -24,10 +24,10 @@ const multiTimings = [];
 let file_name = "";
 if (process.argv[2] === "1") {
     http.globalAgent.keepAlive = true;
-    file_name = "rest_ka.csv";
+    file_name = "rest_ka";
 } else {
     http.globalAgent.keepAlive = false;
-    file_name = "rest.csv";
+    file_name = "rest";
 }
 
 
@@ -37,7 +37,7 @@ const PORT = process.env.PORT || "3001"
 const SERVER_URL = `http://${SERVER_IP}:${PORT}`;
 console.log("SERVER URL: ", SERVER_URL)
 
-
+let error_count = 0;
 const sendRequest = async (endpoint, timing_list) => {
     const timestamp = Number(process.hrtime.bigint())
     const ENDPOINT = `${SERVER_URL}${endpoint}?timestamp=${timestamp}`;
@@ -48,7 +48,8 @@ const sendRequest = async (endpoint, timing_list) => {
             const RTT = Number(process.hrtime.bigint()) - timestamp;
             timing_list.push(RTT)
         } else {
-            console.log(err);
+            timing_list.push(NaN)
+            error_count++;
         }
     })
 };
@@ -60,23 +61,26 @@ const timeIt = async (endpoint, timing_list) => {
     }
 }
 
-let burst_count = 1
+let burst_count = 1;
 // Client entry point.
 const intervalId = setInterval(async () => {
     await timeIt("/empty", emptyTimings)
     await timeIt("/film", singleTimings)
     await timeIt("/films", multiTimings)
-    console.log("Burst: ", burst_count)
+    process.stdout.write("Burst: " + burst_count + "  Errors: " + error_count + "\r")
     burst_count++;
 }, PACKET_BURST_TIME);
 
 setTimeout(() => {
-    console.log("Completed sending Packet Bursts")
+    console.log("\nCompleted sending Packet Bursts")
+    console.log("Waiting for responses")
     clearInterval(intervalId)
 }, TOTAL_TIME);
 
 
 // Exit Hook, Save findings to CSV
 process.on("exit", () => {
+    console.log()
+    console.log("Total Errors: ", error_count)
     csv_writer.write_out_results(file_name, emptyTimings, singleTimings, multiTimings, NUMBER_OF_REQUESTS)
 })

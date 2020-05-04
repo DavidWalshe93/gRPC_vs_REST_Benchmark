@@ -25,23 +25,17 @@ const getCsvStringifier = () => {
 // Utility function to write out the findings to a CSV file.
 const write_out_results = (file_name, emptyTimings, singleItemTimings, multiItemTimings, numberOfRequests) => {
     const data = []
-    const path = `R:\\Data\\${file_name}`
+    const timestamp = Date.now()
+    const path = `R:\\Data\\${file_name}_${timestamp}.csv`
 
     console.log()
-    console.log("Empty Responses: ", emptyTimings.length)
-    console.log("Single Item Responses: ", singleItemTimings.length)
-    console.log("Multi Item Responses: ", multiItemTimings.length)
+    console.log("ER: ", emptyTimings.length, "SIR: ", singleItemTimings.length, " MIR: ", multiItemTimings.length)
 
-    // Add headers if the file does not previously exist
-    fs.access(path, fs.constants.F_OK, (err) => {
-        if (err) {
-            data.push({
-                "empty_timing": "ET",
-                "single_item_timing": "SIT",
-                "multi_item_timing": "MIT"
-            })
-        }
-    });
+    data.push({
+        "empty_timing": "ERT",
+        "single_item_timing": "SIRT",
+        "multi_item_timing": "MIRT"
+    })
 
     let indexSize = Math.max(emptyTimings.length, singleItemTimings.length, multiItemTimings.length)
 
@@ -58,7 +52,7 @@ const write_out_results = (file_name, emptyTimings, singleItemTimings, multiItem
     // running this code from exit hook.
     const csvStringifier = getCsvStringifier()
     fs.appendFileSync(path, csvStringifier.stringifyRecords(data))
-    console.log(`Appended ${numberOfRequests} records to ${path}`)
+    console.log(`Appended ${indexSize} records to ${path}`)
 }
 
 

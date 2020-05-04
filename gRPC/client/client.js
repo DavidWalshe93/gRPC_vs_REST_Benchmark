@@ -32,6 +32,8 @@ const emptyTimings = []
 const singleTimings = []
 const multiTimings = []
 
+let error_count = 0;
+
 
 // Helper method for getting a client connection for the server.
 const getClientConnection = () => {
@@ -65,8 +67,9 @@ const getEmpty = () => {
             const RTT = Number(process.hrtime.bigint()) - response.getTimestamp();
             emptyTimings.push(RTT)
         } else {
-            console.log(error);
-        }
+            emptyTimings.push(NaN);
+            error_count++;
+    }
     });
     process.stdout.write(".");
 };
@@ -82,7 +85,8 @@ const getSingle = async () => {
             const RTT = Number(process.hrtime.bigint()) - response.getTimestamp();
             singleTimings.push(RTT)
         } else {
-            console.log(error);
+            singleTimings.push(NaN);
+            error_count++;
         }
     });
 };
@@ -98,7 +102,8 @@ const getMultiple = async () => {
             const RTT = Number(process.hrtime.bigint())  - response.getTimestamp();
             multiTimings.push(RTT)
         } else {
-            console.log(error);
+            multiTimings.push(NaN);
+            error_count++;
         }
     });
 };
@@ -116,24 +121,20 @@ const intervalId = setInterval(async () => {
     await timeIt(getEmpty)
     await timeIt(getSingle)
     await timeIt(getMultiple)
-    console.log("Burst: ", burst_count)
+    process.stdout.write("Burst: " + burst_count + "  Errors: " + error_count + "\r")
     burst_count++;
 }, PACKET_BURST_TIME);
 
 setTimeout(() => {
+    console.log()
     console.log("Completed sending Packet Bursts")
+    console.log("Waiting for responses")
     clearInterval(intervalId)
 }, TOTAL_TIME);
 
-// // Client entry point.
-// (async () => {
-//     await timeIt(getEmpty)
-//     await timeIt(getSingle)
-//     await timeIt(getMultiple)
-// })();
-
-
 // Exit Hook, Save findings to CSV
 process.on("exit", () => {
-    csv_writer.write_out_results("gRPC.csv", emptyTimings, singleTimings, multiTimings, NUMBER_OF_REQUESTS)
+    console.log()
+    console.log("Total Errors: ", error_count)
+    csv_writer.write_out_results("gRPC", emptyTimings, singleTimings, multiTimings, NUMBER_OF_REQUESTS)
 })
