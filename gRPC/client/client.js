@@ -33,6 +33,7 @@ const singleTimings = []
 const multiTimings = []
 
 let error_count = 0;
+let burst_count = 1
 
 
 // Helper method for getting a client connection for the server.
@@ -109,13 +110,14 @@ const getMultiple = async () => {
 };
 
 
+// Simple Packet sending function.
 const timeIt = async (func) => {
     for (let i = 0; i < NUMBER_OF_REQUESTS; i++) {
         await func();
     }
 }
 
-let burst_count = 1
+
 // Client entry point.
 const intervalId = setInterval(async () => {
     await timeIt(getEmpty)
@@ -125,12 +127,15 @@ const intervalId = setInterval(async () => {
     burst_count++;
 }, PACKET_BURST_TIME);
 
+
+// Stop request sending after 10 bursts.
 setTimeout(() => {
     console.log()
     console.log("Completed sending Packet Bursts")
     console.log("Waiting for responses")
     clearInterval(intervalId)
 }, TOTAL_TIME);
+
 
 // Exit Hook, Save findings to CSV
 process.on("exit", () => {

@@ -16,11 +16,22 @@ const PACKET_BURST_TIME = process.env.PACKET_BURST_TIME || 5000;
 const BURSTS = process.env.BURSTS || 10;
 const TOTAL_TIME = (PACKET_BURST_TIME * BURSTS) + (PACKET_BURST_TIME / 2)
 
+const SERVER_IP = process.env.SERVER_IP || "localhost";
+const PORT = process.env.PORT || "3001"
+
+const SERVER_URL = `http://${SERVER_IP}:${PORT}`;
+console.log("SERVER URL: ", SERVER_URL)
+
 // Timing Capture variables.
 const emptyTimings = [];
 const singleTimings = [];
 const multiTimings = [];
 
+let error_count = 0;
+let burst_count = 1;
+
+
+// Setup depending on whether to run with keep-alive active or not.
 let file_name = "";
 if (process.argv[2] === "1") {
     http.globalAgent.keepAlive = true;
@@ -30,14 +41,7 @@ if (process.argv[2] === "1") {
     file_name = "rest";
 }
 
-
-const SERVER_IP = process.env.SERVER_IP || "localhost";
-const PORT = process.env.PORT || "3001"
-
-const SERVER_URL = `http://${SERVER_IP}:${PORT}`;
-console.log("SERVER URL: ", SERVER_URL)
-
-let error_count = 0;
+// Send a REST request to the server.
 const sendRequest = async (endpoint, timing_list) => {
     const timestamp = Number(process.hrtime.bigint())
     const ENDPOINT = `${SERVER_URL}${endpoint}?timestamp=${timestamp}`;
@@ -55,13 +59,14 @@ const sendRequest = async (endpoint, timing_list) => {
 };
 
 
+// Simple Packet sending function.
 const timeIt = async (endpoint, timing_list) => {
     for (let i = 0; i < NUMBER_OF_REQUESTS; i++) {
         await sendRequest(endpoint, timing_list);
     }
 }
 
-let burst_count = 1;
+
 // Client entry point.
 const intervalId = setInterval(async () => {
     await timeIt("/empty", emptyTimings)
@@ -71,6 +76,8 @@ const intervalId = setInterval(async () => {
     burst_count++;
 }, PACKET_BURST_TIME);
 
+
+// Stop request sending after 10 bursts.
 setTimeout(() => {
     console.log("\nCompleted sending Packet Bursts")
     console.log("Waiting for responses")
